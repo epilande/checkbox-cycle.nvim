@@ -20,11 +20,12 @@ function M.setup(opts)
 end
 
 local function find_checkbox(line)
-  return line:match('^(%s*-?%s*%[.?%])')
-end
+  -- Capture the leading whitespace
+  local indent = line:match('^(%s*)') or ''
+  -- Capture the checkbox pattern
+  local checkbox = line:match('(%-?%s*%[.?%])')
 
-local function replace_checkbox(line, new_state)
-  return line:gsub('^(%s*-?%s*%[.?%])', new_state)
+  return indent, checkbox
 end
 
 local function tbl_indexof(tbl, value)
@@ -42,16 +43,18 @@ local function cycle_state(current_state, direction)
   return M.config.states[new_index]
 end
 
+---Update the checkbox in the current line, adding one if necessary.
+---@param direction number: 1 for next state, -1 for previous state
 local function update_checkbox(direction)
   local line = vim.api.nvim_get_current_line()
-  local checkbox = find_checkbox(line)
+  local indent, checkbox = find_checkbox(line)
 
   if checkbox then
     local new_state = cycle_state(checkbox, direction)
-    local new_line = replace_checkbox(line, new_state)
+    local new_line = line:gsub('^' .. vim.pesc(indent .. checkbox), indent .. new_state)
     vim.api.nvim_set_current_line(new_line)
   else
-    local new_line = M.config.states[1] .. ' ' .. line
+    local new_line = indent .. M.config.states[1] .. ' ' .. line:gsub('^%s*', '')
     vim.api.nvim_set_current_line(new_line)
   end
 end
