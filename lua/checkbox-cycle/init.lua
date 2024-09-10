@@ -23,11 +23,14 @@ function M.setup(opts)
   end
 end
 
+---Finds the leading whitespace and checkbox in a line.
+---@param line string: The input line to check for leading whitespace and checkbox.
+---@return string, string|nil: Returns the leading whitespace and the checkbox pattern (or nil if not found).
 local function find_checkbox(line)
   -- Capture the leading whitespace
   local indent = line:match('^(%s*)') or ''
   -- Capture the checkbox pattern
-  local checkbox = line:match('(%-?%s*%[.?%])')
+  local checkbox = line:match('(%- %[.?%])')
 
   return indent, checkbox
 end
@@ -63,7 +66,9 @@ end
 
 ---Update the checkbox in the current line, adding one if necessary.
 ---@param direction number: 1 for next state, -1 for previous state
-local function update_checkbox(direction)
+---@param cycle_index? number: Optional index of the states cycle to use
+local function update_checkbox(direction, cycle_index)
+  cycle_index = math.max(1, math.min(cycle_index or 1, #M.config.states))
   local line = vim.api.nvim_get_current_line()
   local indent, checkbox = find_checkbox(line)
 
@@ -72,18 +77,22 @@ local function update_checkbox(direction)
     local new_line = line:gsub(vim.pesc(indent .. checkbox), indent .. new_state)
     vim.api.nvim_set_current_line(new_line)
   else
-    local new_state = M.config.states[1][1]
+    local new_state = M.config.states[cycle_index][1]
     local new_line = indent .. new_state .. ' ' .. line:gsub('^%s*', '')
     vim.api.nvim_set_current_line(new_line)
   end
 end
 
-function M.cycle_next()
-  update_checkbox(1)
+---Cycle to the next checkbox state
+---@param cycle_index? number: Optional index of the cycle to use
+function M.cycle_next(cycle_index)
+  update_checkbox(1, cycle_index)
 end
 
-function M.cycle_prev()
-  update_checkbox(-1)
+---Cycle to the previous checkbox state
+---@param cycle_index? number: Optional index of the cycle to use
+function M.cycle_prev(cycle_index)
+  update_checkbox(-1, cycle_index)
 end
 
 return M
