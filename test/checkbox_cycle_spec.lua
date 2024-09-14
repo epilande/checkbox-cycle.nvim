@@ -5,6 +5,10 @@ describe('checkbox-cycle', function()
     checkbox_cycle.setup()
   end)
 
+  after_each(function()
+    vim.cmd('bufdo! bwipeout!')
+  end)
+
   it('cycles to next state', function()
     vim.api.nvim_buf_set_lines(0, 0, -1, false, { '- [ ] Unchecked item' })
     checkbox_cycle.cycle_next()
@@ -95,5 +99,106 @@ describe('checkbox-cycle', function()
     assert.are.same({ '- [!] No checkbox here' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
     checkbox_cycle.cycle_next(3)
     assert.are.same({ '- [~] No checkbox here' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  end)
+
+  it('cycles multiple checkboxes in visual mode while skipping empty lines', function()
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+      '- [ ] Item 1',
+      '',
+      '- [ ] Item 2',
+      '',
+      '- [ ] Item 3',
+    })
+
+    -- Set visual mode selection
+    vim.fn.setpos('.', { 0, 1, 1, 0 }) -- Set cursor to start of first line
+    vim.cmd('normal! V4j')
+
+    checkbox_cycle.cycle_next()
+
+    assert.are.same({
+      '- [x] Item 1',
+      '',
+      '- [x] Item 2',
+      '',
+      '- [x] Item 3',
+    }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  end)
+
+  it('cycles multiple checkboxes in visual mode with custom states', function()
+    checkbox_cycle.setup({
+      states = { '[ ]', '[x]', '[?]' },
+    })
+
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+      '- [ ] Item 1',
+      '- [x] Item 2',
+      '- [?] Item 3',
+    })
+
+    vim.fn.setpos('.', { 0, 1, 1, 0 })
+    vim.cmd('normal! V2j')
+
+    checkbox_cycle.cycle_next()
+
+    assert.are.same({
+      '- [x] Item 1',
+      '- [?] Item 2',
+      '- [ ] Item 3',
+    }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  end)
+
+  it('cycles multiple checkboxes in visual mode with multiple custom states', function()
+    checkbox_cycle.setup({
+      states = {
+        { '[ ]', '[/]', '[x]' },
+        { '[!]', '[?]', '[.]' },
+        { '[~]', '[-]', '[_]' },
+      },
+    })
+
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+      '- [ ] Item 1',
+      '- [!] Item 2',
+      '- [~] Item 3',
+    })
+
+    vim.fn.setpos('.', { 0, 1, 1, 0 })
+    vim.cmd('normal! V2j')
+
+    checkbox_cycle.cycle_next()
+
+    assert.are.same({
+      '- [/] Item 1',
+      '- [?] Item 2',
+      '- [-] Item 3',
+    }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+
+    checkbox_cycle.cycle_next()
+
+    assert.are.same({
+      '- [x] Item 1',
+      '- [.] Item 2',
+      '- [_] Item 3',
+    }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  end)
+
+  it('cycles backwards in visual mode', function()
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+      '- [x] Item 1',
+      '- [x] Item 2',
+      '- [x] Item 3',
+    })
+
+    vim.fn.setpos('.', { 0, 3, 1, 0 })
+    vim.cmd('normal! V2k')
+
+    checkbox_cycle.cycle_prev()
+
+    assert.are.same({
+      '- [ ] Item 1',
+      '- [ ] Item 2',
+      '- [ ] Item 3',
+    }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
   end)
 end)
