@@ -23,9 +23,9 @@ describe('checkbox-cycle', function()
     assert.are.same({ '- [ ] No checkbox here' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
   end)
 
-  it('cycles through custom states', function()
+  it('cycles through custom states without "- " prefix', function()
     checkbox_cycle.setup({
-      states = { '- [ ]', '- [x]', '- [?]' },
+      states = { '[ ]', '[x]', '[?]' },
     })
     vim.api.nvim_buf_set_lines(0, 0, -1, false, { '- [ ] Custom states' })
     checkbox_cycle.cycle_next()
@@ -63,8 +63,8 @@ describe('checkbox-cycle', function()
   it('supports multiple state cycles', function()
     checkbox_cycle.setup({
       states = {
-        { '- [ ]', '- [x]', '- [?]' },
-        { '- [!]', '- [~]', '- [-]' },
+        { '[ ]', '[x]', '[?]' },
+        { '[!]', '[~]', '[-]' },
       },
     })
 

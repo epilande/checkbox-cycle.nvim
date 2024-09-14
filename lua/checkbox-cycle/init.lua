@@ -1,18 +1,17 @@
 local M = {}
 
+M.config = {}
+
 ---@class CheckboxCycleConfig
 ---@field states string[]|string[][] List of checkbox states to cycle through. Can be a single list or a list of lists.
 
 ---@type CheckboxCycleConfig
 local default_config = {
   states = {
-    '- [ ]',
-    '- [x]',
+    '[ ]',
+    '[x]',
   },
 }
-
----@type CheckboxCycleConfig
-M.config = {}
 
 ---@param opts? CheckboxCycleConfig
 function M.setup(opts)
@@ -20,6 +19,15 @@ function M.setup(opts)
   -- Ensure states is always a list of lists
   if type(M.config.states[1]) == 'string' then
     M.config.states = { M.config.states }
+  end
+  -- Add '- ' prefix to all states if not present
+  for i, cycle in ipairs(M.config.states) do
+    ---@cast cycle string[]
+    for j, state in ipairs(cycle) do
+      if not state:match('^%- ') then
+        M.config.states[i][j] = '- ' .. state
+      end
+    end
   end
 end
 
@@ -30,7 +38,7 @@ local function find_checkbox(line)
   -- Capture the leading whitespace
   local indent = line:match('^(%s*)') or ''
   -- Capture the checkbox pattern
-  local checkbox = line:match('(%- %[.?%])')
+  local checkbox = line:match('^%s*(%- %[.?%])')
 
   return indent, checkbox
 end
