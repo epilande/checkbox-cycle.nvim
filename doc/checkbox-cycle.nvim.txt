@@ -1,66 +1,255 @@
-*nvim-plugin-template.txt*     For NVIM v0.8.0     Last change: 2024 August 27
+*checkbox-cycle.nvim.txt*    For NVIM v0.8.0    Last change: 2024 September 14
 
 ==============================================================================
-Table of Contents                     *nvim-plugin-template-table-of-contents*
+Table of Contents                      *checkbox-cycle.nvim-table-of-contents*
 
-1. nvim-plugin-template            |nvim-plugin-template-nvim-plugin-template|
-  - Usage                    |nvim-plugin-template-nvim-plugin-template-usage|
-  - Format                  |nvim-plugin-template-nvim-plugin-template-format|
-  - Test                      |nvim-plugin-template-nvim-plugin-template-test|
-  - CI                          |nvim-plugin-template-nvim-plugin-template-ci|
-  - More                      |nvim-plugin-template-nvim-plugin-template-more|
-  - License MIT        |nvim-plugin-template-nvim-plugin-template-license-mit|
+  - ❓ Why?                                    |checkbox-cycle.nvim-❓-why?|
+  - ✨ Features                            |checkbox-cycle.nvim-✨-features|
+  - 📦 Installation                  |checkbox-cycle.nvim-📦-installation|
+  - ⚙️ Configuration            |checkbox-cycle.nvim-⚙️-configuration|
+  - 🎮 Usage                                |checkbox-cycle.nvim-🎮-usage|
+  - 🔬 Advanced Usage              |checkbox-cycle.nvim-🔬-advanced-usage|
+  - 🛠️ API                              |checkbox-cycle.nvim-🛠️-api|
 
-==============================================================================
-1. nvim-plugin-template            *nvim-plugin-template-nvim-plugin-template*
+A Neovim plugin for cycling through checkbox states.
+❓ WHY?                                        *checkbox-cycle.nvim-❓-why?*
 
-Neovim plugin template; includes automatic documentation generation from
-README, integration tests with Busted, and linting with Stylua
-
-
-USAGE                        *nvim-plugin-template-nvim-plugin-template-usage*
-
-1. Click `use this template` button generate a repo on your github.
-2. Clone your plugin repo. Open terminal then cd plugin directory.
-3. Run `python3 rename.py your-plugin-name`. This will replace all `nvim-plugin-template` to your `plugin-name`.
-Then it will prompt you input `y` or `n` to remove example codes in `init.lua` and
-`test/plugin_spec.lua`. If you are familiar this repo just input `y`. If you are looking at this template for the first time I suggest you inspect the contents. After this step `rename.py` will also auto-remove.
-
-Now you have a clean plugin environment. Enjoy!
+Managing checkboxes in markdown files can be tedious, especially when working
+with to-do lists or task management in documents. Manually typing out or
+toggling between different checkbox states (unchecked, in-progress, checked,
+etc.) slows down your workflow. `checkbox-cycle.nvim` simplifies this by
+allowing you to effortlessly toggle and cycle through custom checkbox states,
+streamlining task management directly within Neovim.
 
 
-FORMAT                      *nvim-plugin-template-nvim-plugin-template-format*
+✨ FEATURES                                *checkbox-cycle.nvim-✨-features*
 
-The CI uses `stylua` to format the code; customize the formatting by editing
-`.stylua.toml`.
-
-
-TEST                          *nvim-plugin-template-nvim-plugin-template-test*
-
-Uses busted <https://lunarmodules.github.io/busted/> for testing. Installs by
-using `luarocks --lua-version=5.1 install vusted` then runs `vusted ./test` for
-your test cases. `vusted` is a wrapper of Busted especially for testing Neovim
-plugins.
-
-Create test cases in the `test` folder. Busted expects files in this directory
-to be named `foo_spec.lua`, with `_spec` as a suffix before the `.lua` file
-extension. For more usage details please check busted usage
-<https://lunarmodules.github.io/busted/>
+- 🔄 Cycle through customizable checkbox states.
+- 🤹 Support for multiple state cycles.
+- ⌨️ Easy integration with keybindings.
+- 🧘 Preserve indentation when cycling checkboxes.
+- ☑️ Add checkboxes to lines that don’t have them.
+- 🌈 Visual mode support for cycling multiple checkboxes.
 
 
-CI                              *nvim-plugin-template-nvim-plugin-template-ci*
+📦 INSTALLATION                      *checkbox-cycle.nvim-📦-installation*
 
-- Auto generates doc from README.
-- Runs the Busted/vusted integration tests
-- Lints with `stylua`.
+Using lazy.nvim <https://github.com/folke/lazy.nvim>:
+
+>lua
+    {
+      'epilande/checkbox-cycle.nvim',
+      ft = 'markdown',
+      opts = {
+        states = { '[ ]', '[/]', '[x]', '[~]' },
+      },
+      keys = {
+        {
+          '<CR>',
+          '<Cmd>CheckboxCycleNext<CR>',
+          desc = 'Checkbox Next',
+          ft = { 'markdown' },
+          mode = { 'n', 'v' },
+        },
+        {
+          '<S-CR>',
+          '<Cmd>CheckboxCyclePrev<CR>',
+          desc = 'Checkbox Previous',
+          ft = { 'markdown' },
+          mode = { 'n', 'v' },
+        },
+      },
+    }
+<
+
+Recommended plugins to complement checkbox-cycle.nvim for custom checkboxes ~
 
 
-MORE                          *nvim-plugin-template-nvim-plugin-template-more*
+RENDER-MARKDOWN.NVIM ~
 
-To see this template in action, take a look at my other plugins.
+`render-markdown.nvim`
+<https://github.com/MeanderingProgrammer/render-markdown.nvim> is a plugin that
+improves the visual rendering of Markdown files within Neovim.
+
+Example config:
+
+>lua
+    {
+      'MeanderingProgrammer/render-markdown.nvim',
+      dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' },
+      opts = {
+        checkbox = {
+          custom = {
+            ['in-progress'] = { raw = '[/]', rendered = '󰿦', highlight = 'RenderMarkdownWarn' },
+            urgent = { raw = '[!]', rendered = '󰄱', highlight = 'RenderMarkdownError' },
+            canceled = { raw = '[~]', rendered = '󰂭', highlight = 'RenderMarkdownError' },
+            todo = { raw = '[-]', rendered = '', highlight = 'Comment' },
+            forwarded = { raw = '[>]', rendered = '󰒊', highlight = 'RenderMarkdownHint' },
+            scheduled = { raw = '[<]', rendered = '󰃰', highlight = 'RenderMarkdownHint' },
+            info = { raw = '[i]', rendered = '󰋼', highlight = 'RenderMarkdownInfo' },
+            question = { raw = '[?]', rendered = '', highlight = 'RenderMarkdownWarn' },
+            idea = { raw = '[I]', rendered = '󰛨', highlight = 'RenderMarkdownWarn' },
+            pros = { raw = '[p]', rendered = '󰔓', highlight = 'RenderMarkdownSuccess' },
+            cons = { raw = '[c]', rendered = '󰔑', highlight = 'RenderMarkdownError' },
+            star = { raw = '[s]', rendered = '󰓎', highlight = 'RenderMarkdownWarn' },
+            f = { raw = '[f]', rendered = '󰈸', highlight = 'RenderMarkdownH2' },
+          },
+        },
+      },
+    }
+<
 
 
-LICENSE MIT            *nvim-plugin-template-nvim-plugin-template-license-mit*
+OBSIDIAN.NVIM ~
+
+If you’re working with Obsidian vaults, `obsidian.nvim`
+<https://github.com/epwalsh/obsidian.nvim> can be a great addition. While
+it’s primarily designed for Obsidian-specific features, it also offers some
+Markdown enhancements.
+
+Example config:
+
+>lua
+    {
+      'epwalsh/obsidian.nvim',
+      version = '*',
+      lazy = true,
+      ft = 'markdown',
+      opts = {
+        ui = {
+          enable = true,
+          checkboxes = {
+            [' '] = { char = '󰄱', hl_group = 'Comment' }, -- Todo
+            ['/'] = { char = '󰿦', hl_group = 'DiagnosticWarn' }, -- In-progress
+            ['x'] = { char = '󰄲', hl_group = 'DiagnosticOk' }, -- Done
+            ['!'] = { char = '󰄱', hl_group = 'DiagnosticError' }, -- Urgent
+            ['~'] = { char = '󰂭', hl_group = 'ObsidianTilde' }, -- Canceled
+            ['-'] = { char = '', hl_group = 'Comment' }, -- Skip
+            ['>'] = { char = '󰒊', hl_group = 'DiagnosticHint' }, -- Forwarded
+            ['<'] = { char = '󰃰', hl_group = 'DiagnosticHint' }, -- Scheduled
+            ['i'] = { char = '󰋼', hl_group = 'DiagnosticInfo' }, -- Info
+            ['?'] = { char = '', hl_group = 'DiagnosticWarn' }, -- Question
+            ['I'] = { char = '󰛨', hl_group = 'DiagnosticWarn' }, -- Idea
+            ['p'] = { char = '󰔓', hl_group = 'DiagnosticOk' }, -- Pros
+            ['c'] = { char = '󰔑', hl_group = 'DiagnosticError' }, -- Cons
+            ['s'] = { char = '󰓎', hl_group = 'DiagnosticWarn' }, -- Star
+            ['f'] = { char = '󰈸', hl_group = 'ObsidianRightArrow' }, -- Fire
+          },
+          external_link_icon = { char = '', hl_group = 'ObsidianExtLinkIcon' },
+        },
+      },
+    }
+<
+
+
+⚙️ CONFIGURATION                *checkbox-cycle.nvim-⚙️-configuration*
+
+The plugin comes with default settings, but you can customize it to fit your
+needs:
+
+>lua
+    require('checkbox-cycle').setup({
+      states = {
+        { '[ ]', '[x]', '[?]' },
+        { '[!]', '[~]', '[-]' },
+      }
+    })
+<
+
+
+OPTIONS ~
+
+- `states`: A list of lists, where each inner list represents a cycle of checkbox states. You can define multiple cycles for different types of checkboxes.
+
+Defaults ~
+
+>lua
+    {
+      states = {
+        { '[ ]', '[x]' },
+      }
+    }
+<
+
+
+🎮 USAGE                                    *checkbox-cycle.nvim-🎮-usage*
+
+The plugin provides two main functions:
+
+1. `cycle_next(cycle_index)` - Cycle to the next checkbox state
+2. `cycle_prev(cycle_index)` - Cycle to the previous checkbox state
+
+Parameters:
+
+- `cycle_index` (optional): Specifies which state cycle to use. If not provided, it defaults to the first cycle.
+
+You can create keybindings for these functions or use the provided commands:
+
+- `:CheckboxCycleNext` - Cycle to the next state
+- `:CheckboxCyclePrev` - Cycle to the previous state
+
+These commands work in both normal mode (for single lines) and visual mode (for
+multiple lines).
+
+
+EXAMPLE KEYBINDINGS ~
+
+This plugin does not provide any default keybindings, so you’ll need to add
+them manually to your Neovim configuration. Here’s an example:
+
+>lua
+    vim.keymap.set({ 'n', 'v' }, '<CR>', '<Cmd>CheckboxCycleNext<CR>', { noremap = true, silent = true })
+    vim.keymap.set({ 'n', 'v' }, '<S-CR>', '<Cmd>CheckboxCyclePrev<CR>', { noremap = true, silent = true })
+<
+
+
+🔬 ADVANCED USAGE                  *checkbox-cycle.nvim-🔬-advanced-usage*
+
+
+MULTIPLE STATE CYCLES ~
+
+You can define multiple state cycles and use them selectively:
+
+>lua
+    require('checkbox-cycle').setup({
+      states = {
+        { '[ ]', '[/]', '[x]' },
+        { '[>]', '[<]' },
+        { '[!]', '[~]', '[-]' },
+      }
+    })
+<
+
+To cycle through a specific state cycle, use the `cycle_next()` or
+`cycle_prev()` functions with an index:
+
+>lua
+    require('checkbox-cycle').cycle_next(2) -- Uses the second cycle: { '- [>]', '- [<]' }
+<
+
+
+VISUAL MODE ~
+
+The plugin supports cycling checkboxes in visual mode. This allows you to
+select multiple lines and cycle their checkboxes all at once. Here’s how it
+works:
+
+1. Enter visual mode ('v' or 'V')
+2. Select the lines containing the checkboxes you want to cycle
+3. Use your keybinding or command to cycle the checkboxes
+
+All selected checkboxes will cycle to their next or previous state, depending
+on the command used. This feature is particularly useful for managing large
+lists or updating the status of multiple tasks at once.
+
+
+🛠️ API                                  *checkbox-cycle.nvim-🛠️-api*
+
+The plugin exposes the following functions:
+
+- `setup(opts)`: Configure the plugin with custom options
+- `cycle_next(cycle_index)`: Cycle to the next checkbox state
+- `cycle_prev(cycle_index)`: Cycle to the previous checkbox state
 
 Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
 
