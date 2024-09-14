@@ -12,12 +12,12 @@ Managing checkboxes in markdown files can be tedious, especially when working wi
 
 ## ✨ Features
 
-- 🔄 Cycle through customizable checkbox states
-- 🤹 Support for multiple state cycles
-- ⌨️ Easy integration with keybindings
-- 🧘 Preserve indentation when cycling checkboxes
-- ☑️ Add checkboxes to lines that don't have them
-- 🌈 Visual mode support for cycling multiple checkboxes
+- 🔄 Cycle through customizable checkbox states.
+- 🤹 Support for multiple state cycles.
+- ⌨️ Easy integration with keybindings.
+- 🧘 Preserve indentation when cycling checkboxes.
+- ☑️ Add checkboxes to lines that don't have them.
+- 🌈 Visual mode support for cycling multiple checkboxes.
 
 ## 📦 Installation
 
@@ -48,6 +48,80 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
   },
 }
 ```
+
+<details><summary>Recommended plugins to complement <code>checkbox-cycle.nvim</code> for custom checkboxes</summary>
+
+### render-markdown.nvim
+
+[`render-markdown.nvim`](https://github.com/MeanderingProgrammer/render-markdown.nvim) is a plugin that improves the visual rendering of Markdown files within Neovim. 
+
+Example config:
+
+```lua
+{
+  'MeanderingProgrammer/render-markdown.nvim',
+  dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' },
+  opts = {
+    checkbox = {
+      custom = {
+        ['in-progress'] = { raw = '[/]', rendered = '󰿦', highlight = 'RenderMarkdownWarn' },
+        urgent = { raw = '[!]', rendered = '󰄱', highlight = 'RenderMarkdownError' },
+        canceled = { raw = '[~]', rendered = '󰂭', highlight = 'RenderMarkdownError' },
+        todo = { raw = '[-]', rendered = '', highlight = 'Comment' },
+        forwarded = { raw = '[>]', rendered = '󰒊', highlight = 'RenderMarkdownHint' },
+        scheduled = { raw = '[<]', rendered = '󰃰', highlight = 'RenderMarkdownHint' },
+        info = { raw = '[i]', rendered = '󰋼', highlight = 'RenderMarkdownInfo' },
+        question = { raw = '[?]', rendered = '', highlight = 'RenderMarkdownWarn' },
+        idea = { raw = '[I]', rendered = '󰛨', highlight = 'RenderMarkdownWarn' },
+        pros = { raw = '[p]', rendered = '󰔓', highlight = 'RenderMarkdownSuccess' },
+        cons = { raw = '[c]', rendered = '󰔑', highlight = 'RenderMarkdownError' },
+        star = { raw = '[s]', rendered = '󰓎', highlight = 'RenderMarkdownWarn' },
+        f = { raw = '[f]', rendered = '󰈸', highlight = 'RenderMarkdownH2' },
+      },
+    },
+  },
+}
+```
+
+### obsidian.nvim
+
+If you're working with Obsidian vaults, [`obsidian.nvim`](https://github.com/epwalsh/obsidian.nvim) can be a great addition. While it's primarily designed for Obsidian-specific features, it also offers some Markdown enhancements. 
+
+Example config:
+
+```lua
+{
+  'epwalsh/obsidian.nvim',
+  version = '*',
+  lazy = true,
+  ft = 'markdown',
+  opts = {
+    ui = {
+      enable = true,
+      checkboxes = {
+        [' '] = { char = '󰄱', hl_group = 'Comment' }, -- Todo
+        ['/'] = { char = '󰿦', hl_group = 'DiagnosticWarn' }, -- In-progress
+        ['x'] = { char = '󰄲', hl_group = 'DiagnosticOk' }, -- Done
+        ['!'] = { char = '󰄱', hl_group = 'DiagnosticError' }, -- Urgent
+        ['~'] = { char = '󰂭', hl_group = 'ObsidianTilde' }, -- Canceled
+        ['-'] = { char = '', hl_group = 'Comment' }, -- Skip
+        ['>'] = { char = '󰒊', hl_group = 'DiagnosticHint' }, -- Forwarded
+        ['<'] = { char = '󰃰', hl_group = 'DiagnosticHint' }, -- Scheduled
+        ['i'] = { char = '󰋼', hl_group = 'DiagnosticInfo' }, -- Info
+        ['?'] = { char = '', hl_group = 'DiagnosticWarn' }, -- Question
+        ['I'] = { char = '󰛨', hl_group = 'DiagnosticWarn' }, -- Idea
+        ['p'] = { char = '󰔓', hl_group = 'DiagnosticOk' }, -- Pros
+        ['c'] = { char = '󰔑', hl_group = 'DiagnosticError' }, -- Cons
+        ['s'] = { char = '󰓎', hl_group = 'DiagnosticWarn' }, -- Star
+        ['f'] = { char = '󰈸', hl_group = 'ObsidianRightArrow' }, -- Fire
+      },
+      external_link_icon = { char = '', hl_group = 'ObsidianExtLinkIcon' },
+    },
+  },
+}
+```
+
+</details>
 
 ## ⚙️ Configuration
 
@@ -145,3 +219,4 @@ The plugin exposes the following functions:
 - `setup(opts)`: Configure the plugin with custom options
 - `cycle_next(cycle_index)`: Cycle to the next checkbox state
 - `cycle_prev(cycle_index)`: Cycle to the previous checkbox state
+
