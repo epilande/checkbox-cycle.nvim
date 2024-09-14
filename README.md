@@ -6,41 +6,41 @@
   <strong>A Neovim plugin for cycling through checkbox states.</strong>
 </p>
 
-## Why?
+## ❓ Why?
 
 Managing checkboxes in markdown files can be tedious, especially when working with to-do lists or task management in documents. Manually typing out or toggling between different checkbox states (unchecked, in-progress, checked, etc.) slows down your workflow. `checkbox-cycle.nvim` simplifies this by allowing you to effortlessly toggle and cycle through custom checkbox states, streamlining task management directly within Neovim.
 
 ## ✨ Features
 
 - 🔄 Cycle through customizable checkbox states
-- 🔀 Support for multiple state cycles
+- 🤹 Support for multiple state cycles
 - ⌨️ Easy integration with keybindings
 - 🧘 Preserve indentation when cycling checkboxes
 - ☑️ Add checkboxes to lines that don't have them
 
-## 🚀 Installation
+## 📦 Installation
 
 Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
   'epilande/checkbox-cycle.nvim',
-  ft = "markdown",
+  ft = 'markdown',
   opts = {
-    states = { "- [ ]", "- [/]", "- [x]", "- [~]" },
+    states = { '[ ]', '[/]', '[x]', '[~]' },
   },
   keys = {
     {
-      "<CR>",
-      "<Cmd>CheckboxCycleNext<CR>",
-      desc = "Checkbox Next",
-      ft = { "markdown" },
+      '<CR>',
+      '<Cmd>CheckboxCycleNext<CR>',
+      desc = 'Checkbox Next',
+      ft = { 'markdown' },
     },
     {
-      "<S-CR>",
-      "<Cmd>CheckboxCyclePrev<CR>",
-      desc = "Checkbox Previous",
-      ft = { "markdown" },
+      '<S-CR>',
+      '<Cmd>CheckboxCyclePrev<CR>',
+      desc = 'Checkbox Previous',
+      ft = { 'markdown' },
     },
   },
 }
@@ -53,8 +53,8 @@ The plugin comes with default settings, but you can customize it to fit your nee
 ```lua
 require('checkbox-cycle').setup({
   states = {
-    { '- [ ]', '- [x]', '- [?]' },
-    { '- [!]', '- [~]', '- [-]' },
+    { '[ ]', '[x]', '[?]' },
+    { '[!]', '[~]', '[-]' },
   }
 })
 ```
@@ -63,17 +63,18 @@ require('checkbox-cycle').setup({
 
 - `states`: A list of lists, where each inner list represents a cycle of checkbox states. You can define multiple cycles for different types of checkboxes.
 
-## 📦 Defaults
-
-The default configuration is as follows:
+<details>
+<summary><strong>Defaults</strong></summary>
 
 ```lua
 {
   states = {
-    { '- [ ]', '- [x]' },
+    { '[ ]', '[x]' },
   }
 }
 ```
+
+</details>
 
 ## 🎮 Usage
 
@@ -109,9 +110,9 @@ You can define multiple state cycles and use them selectively:
 ```lua
 require('checkbox-cycle').setup({
   states = {
-    { '- [ ]', '- [x]', '- [?]' },
-    { '- [>]', '- [<]' },
-    { '- [!]', '- [~]', '- [-]' },
+    { '[ ]', '[/]', '[x]' },
+    { '[>]', '[<]' },
+    { '[!]', '[~]', '[-]' },
   }
 })
 ```
