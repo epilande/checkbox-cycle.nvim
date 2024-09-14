@@ -6,6 +6,8 @@
   <strong>A Neovim plugin for cycling through checkbox states.</strong>
 </p>
 
+![checkbox-cycle](https://github.com/user-attachments/assets/1476a626-b957-4720-95f0-fb2724404ae1)
+
 ## ❓ Why?
 
 Managing checkboxes in markdown files can be tedious, especially when working with to-do lists or task management in documents. Manually typing out or toggling between different checkbox states (unchecked, in-progress, checked, etc.) slows down your workflow. `checkbox-cycle.nvim` simplifies this by allowing you to effortlessly toggle and cycle through custom checkbox states, streamlining task management directly within Neovim.
