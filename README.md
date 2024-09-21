@@ -29,9 +29,12 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 {
   'epilande/checkbox-cycle.nvim',
   ft = 'markdown',
+  -- Optional: Configuration
   opts = {
+    -- Example: Custom states
     states = { '[ ]', '[/]', '[x]', '[~]' },
   },
+  -- Optional: Key mappings
   keys = {
     {
       '<CR>',
@@ -55,7 +58,7 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ### render-markdown.nvim
 
-[`render-markdown.nvim`](https://github.com/MeanderingProgrammer/render-markdown.nvim) is a plugin that improves the visual rendering of Markdown files within Neovim. 
+[`render-markdown.nvim`](https://github.com/MeanderingProgrammer/render-markdown.nvim) is a plugin that improves the visual rendering of Markdown files within Neovim.
 
 Example config:
 
@@ -87,7 +90,7 @@ Example config:
 
 ### obsidian.nvim
 
-If you're working with Obsidian vaults, [`obsidian.nvim`](https://github.com/epwalsh/obsidian.nvim) can be a great addition. While it's primarily designed for Obsidian-specific features, it also offers some Markdown enhancements. 
+If you're working with Obsidian vaults, [`obsidian.nvim`](https://github.com/epwalsh/obsidian.nvim) can be a great addition. While it's primarily designed for Obsidian-specific features, it also offers some Markdown enhancements.
 
 Example config:
 
@@ -221,4 +224,3 @@ The plugin exposes the following functions:
 - `setup(opts)`: Configure the plugin with custom options
 - `cycle_next(cycle_index)`: Cycle to the next checkbox state
 - `cycle_prev(cycle_index)`: Cycle to the previous checkbox state
-
