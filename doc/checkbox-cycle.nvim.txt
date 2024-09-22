@@ -1,4 +1,4 @@
-*checkbox-cycle.nvim.txt*    For NVIM v0.8.0    Last change: 2024 September 14
+*checkbox-cycle.nvim.txt*    For NVIM v0.8.0    Last change: 2024 September 22
 
 ==============================================================================
 Table of Contents                      *checkbox-cycle.nvim-table-of-contents*
@@ -41,9 +41,12 @@ Using lazy.nvim <https://github.com/folke/lazy.nvim>:
     {
       'epilande/checkbox-cycle.nvim',
       ft = 'markdown',
+      -- Optional: Configuration
       opts = {
+        -- Example: Custom states
         states = { '[ ]', '[/]', '[x]', '[~]' },
       },
+      -- Optional: Key mappings
       keys = {
         {
           '<CR>',
