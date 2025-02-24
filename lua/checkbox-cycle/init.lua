@@ -20,11 +20,13 @@ function M.setup(opts)
   if type(M.config.states[1]) == 'string' then
     M.config.states = { M.config.states }
   end
-  -- Add '- ' prefix to all states if not present
+  -- Add '- ' or '* ' prefix to all states if not present
   for i, cycle in ipairs(M.config.states) do
     ---@cast cycle string[]
     for j, state in ipairs(cycle) do
-      if not state:match('^%- ') then
+      -- Check if state already has a prefix
+      if not state:match('^[%-*] ') then
+        -- Default to dash prefix if none present
         M.config.states[i][j] = '- ' .. state
       end
     end
@@ -36,7 +38,8 @@ end
 ---@return string, string|nil: Returns the leading whitespace and the checkbox pattern (or nil if not found).
 local function find_checkbox(line)
   local indent = line:match('^(%s*)') or ''
-  local checkbox = line:match('^%s*(%- %[.?%])')
+  -- Updated pattern to match both - and * before checkbox
+  local checkbox = line:match('^%s*[%-*] %[.?%]')
   return indent, checkbox
 end
 
@@ -50,8 +53,11 @@ local function tbl_indexof(tbl, value)
 end
 
 local function find_cycle_index(current_state)
+  -- Normalize the current state by replacing the prefix with '- '
+  local normalized_state = current_state:gsub('^[%-*] ', '- ')
+
   for i, cycle in ipairs(M.config.states) do
-    local index = tbl_indexof(cycle, current_state)
+    local index = tbl_indexof(cycle, normalized_state)
     if index then
       return i, index
     end
@@ -79,8 +85,14 @@ local function update_checkbox_line(line, direction, cycle_index)
   local indent, checkbox = find_checkbox(line)
 
   if checkbox then
-    local new_state = cycle_state(checkbox, direction)
-    local new_line = line:gsub(vim.pesc(indent .. checkbox), indent .. new_state)
+    -- Remove indentation from checkbox for state matching
+    local checkbox_without_indent = checkbox:match('[%-*] %[.?%]')
+    -- Extract the list marker (- or *) from the existing checkbox
+    local list_marker = checkbox:match('[%-*]')
+    -- Get the new state and replace the marker
+    local new_state = cycle_state(checkbox_without_indent, direction):gsub('^%-', list_marker)
+    -- Replace the old checkbox (with indent) with the new state (with indent)
+    local new_line = line:gsub(vim.pesc(checkbox), indent .. new_state)
     return new_line
   else
     local new_state = M.config.states[cycle_index][1]
