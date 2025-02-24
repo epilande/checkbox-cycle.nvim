@@ -293,4 +293,44 @@ describe('checkbox-cycle', function()
       '- [x] Item 4',
     }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
   end)
+
+  it('cycles states with "+ " prefix', function()
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, { '+ [ ] Unchecked item' })
+    checkbox_cycle.cycle_next()
+    assert.are.same({ '+ [x] Unchecked item' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  end)
+
+  it('handles mixed markers in multiple state cycles', function()
+    checkbox_cycle.setup({
+      states = {
+        { '[ ]', '[x]', '[?]' },
+        { '[!]', '[~]', '[-]' },
+      },
+    })
+
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+      '* [ ] First with asterisk',
+      '+ [!] Second with plus',
+      '- [?] Third with dash',
+    })
+
+    -- Test all lines
+    vim.fn.setpos('.', { 0, 1, 1, 0 })
+    vim.cmd('normal! V2j')
+    checkbox_cycle.cycle_next()
+
+    assert.are.same({
+      '* [x] First with asterisk',
+      '+ [~] Second with plus',
+      '- [ ] Third with dash',
+    }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  end)
+
+  it('handles indented plus checkboxes correctly', function()
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, { '  + [ ] Indented checkbox' })
+    checkbox_cycle.cycle_next()
+    assert.are.same({ '  + [x] Indented checkbox' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+    checkbox_cycle.cycle_next()
+    assert.are.same({ '  + [ ] Indented checkbox' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  end)
 end)

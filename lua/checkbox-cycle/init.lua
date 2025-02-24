@@ -2,6 +2,15 @@ local M = {}
 
 M.config = {}
 
+local PATTERNS = {
+  MARKERS = '[%-%*%+]',
+  CHECKBOX = '%[.?%]',
+  INDENT = '^(%s*)',
+}
+
+PATTERNS.FULL_CHECKBOX = PATTERNS.MARKERS .. ' ' .. PATTERNS.CHECKBOX
+PATTERNS.FULL_CHECKBOX_WITH_INDENT = '^%s*' .. PATTERNS.FULL_CHECKBOX
+
 ---@class CheckboxCycleConfig
 ---@field states string[]|string[][] List of checkbox states to cycle through. Can be a single list or a list of lists.
 
@@ -20,12 +29,12 @@ function M.setup(opts)
   if type(M.config.states[1]) == 'string' then
     M.config.states = { M.config.states }
   end
-  -- Add '- ' or '* ' prefix to all states if not present
+  -- Add marker prefix to all states if not present
   for i, cycle in ipairs(M.config.states) do
     ---@cast cycle string[]
     for j, state in ipairs(cycle) do
       -- Check if state already has a prefix
-      if not state:match('^[%-*] ') then
+      if not state:match('^' .. PATTERNS.FULL_CHECKBOX) then
         -- Default to dash prefix if none present
         M.config.states[i][j] = '- ' .. state
       end
@@ -37,9 +46,8 @@ end
 ---@param line string: The input line to check for leading whitespace and checkbox.
 ---@return string, string|nil: Returns the leading whitespace and the checkbox pattern (or nil if not found).
 local function find_checkbox(line)
-  local indent = line:match('^(%s*)') or ''
-  -- Updated pattern to match both - and * before checkbox
-  local checkbox = line:match('^%s*[%-*] %[.?%]')
+  local indent = line:match(PATTERNS.INDENT) or ''
+  local checkbox = line:match(PATTERNS.FULL_CHECKBOX_WITH_INDENT)
   return indent, checkbox
 end
 
@@ -54,7 +62,7 @@ end
 
 local function find_cycle_index(current_state)
   -- Normalize the current state by replacing the prefix with '- '
-  local normalized_state = current_state:gsub('^[%-*] ', '- ')
+  local normalized_state = current_state:gsub('^' .. PATTERNS.MARKERS .. ' ', '- ')
 
   for i, cycle in ipairs(M.config.states) do
     local index = tbl_indexof(cycle, normalized_state)
@@ -86,9 +94,9 @@ local function update_checkbox_line(line, direction, cycle_index)
 
   if checkbox then
     -- Remove indentation from checkbox for state matching
-    local checkbox_without_indent = checkbox:match('[%-*] %[.?%]')
-    -- Extract the list marker (- or *) from the existing checkbox
-    local list_marker = checkbox:match('[%-*]')
+    local checkbox_without_indent = checkbox:match(PATTERNS.FULL_CHECKBOX)
+    -- Extract the list marker (-, * or +) from the existing checkbox
+    local list_marker = checkbox:match(PATTERNS.MARKERS)
     -- Get the new state and replace the marker
     local new_state = cycle_state(checkbox_without_indent, direction):gsub('^%-', list_marker)
     -- Replace the old checkbox (with indent) with the new state (with indent)
@@ -96,7 +104,7 @@ local function update_checkbox_line(line, direction, cycle_index)
     return new_line
   else
     local new_state = M.config.states[cycle_index][1]
-    return indent .. new_state .. ' ' .. line:gsub('^%s*', '')
+    return indent .. new_state .. ' ' .. line:gsub(PATTERNS.INDENT, '')
   end
 end
 
