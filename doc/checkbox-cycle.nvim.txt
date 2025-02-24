@@ -1,4 +1,4 @@
-*checkbox-cycle.nvim.txt*    For NVIM v0.8.0    Last change: 2024 September 22
+*checkbox-cycle.nvim.txt*     For NVIM v0.8.0    Last change: 2025 February 24
 
 ==============================================================================
 Table of Contents                      *checkbox-cycle.nvim-table-of-contents*
@@ -27,6 +27,7 @@ streamlining task management directly within Neovim.
 
 - 🔄 Cycle through customizable checkbox states.
 - 🤹 Support for multiple state cycles.
+- 📝 Support for all standard markdown list markers (`-`, `*`, `+`)
 - ⌨️ Easy integration with keybindings.
 - 🧘 Preserve indentation when cycling checkboxes.
 - ☑️ Add checkboxes to lines that don’t have them.
@@ -204,6 +205,26 @@ them manually to your Neovim configuration. Here’s an example:
 >lua
     vim.keymap.set({ 'n', 'v' }, '<CR>', '<Cmd>CheckboxCycleNext<CR>', { noremap = true, silent = true })
     vim.keymap.set({ 'n', 'v' }, '<S-CR>', '<Cmd>CheckboxCyclePrev<CR>', { noremap = true, silent = true })
+<
+
+
+LIST MARKERS ~
+
+The plugin supports all standard markdown list markers:
+
+>
+    - [ ] Task with hyphen
+    * [ ] Task with asterisk
+    + [ ] Task with plus sign
+<
+
+You can freely mix different markers in the same document, and the plugin will
+maintain each marker when cycling states:
+
+>
+    - [ ] First task
+    * [x] Second task
+    + [/] Third task
 <
 
 
