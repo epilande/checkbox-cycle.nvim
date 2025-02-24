@@ -16,6 +16,7 @@ Managing checkboxes in markdown files can be tedious, especially when working wi
 
 - 🔄 Cycle through customizable checkbox states.
 - 🤹 Support for multiple state cycles.
+- 📝 Support for all standard markdown list markers (`-`, `*`, `+`)
 - ⌨️ Easy integration with keybindings.
 - 🧘 Preserve indentation when cycling checkboxes.
 - ☑️ Add checkboxes to lines that don't have them.
@@ -183,6 +184,24 @@ This plugin does not provide any default keybindings, so you’ll need to add th
 ```lua
 vim.keymap.set({ 'n', 'v' }, '<CR>', '<Cmd>CheckboxCycleNext<CR>', { noremap = true, silent = true })
 vim.keymap.set({ 'n', 'v' }, '<S-CR>', '<Cmd>CheckboxCyclePrev<CR>', { noremap = true, silent = true })
+```
+
+### List Markers
+
+The plugin supports all standard markdown list markers:
+
+```
+- [ ] Task with hyphen
+* [ ] Task with asterisk
++ [ ] Task with plus sign
+```
+
+You can freely mix different markers in the same document, and the plugin will maintain each marker when cycling states:
+
+```
+- [ ] First task
+* [x] Second task
++ [/] Third task
 ```
 
 ## 🔬 Advanced Usage
