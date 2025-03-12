@@ -104,7 +104,21 @@ local function update_checkbox_line(line, direction, cycle_index)
     return new_line
   else
     local new_state = M.config.states[cycle_index][1]
-    return indent .. new_state .. ' ' .. line:gsub(PATTERNS.INDENT, '')
+    -- Check if line already starts with a list marker
+    local list_marker = line:match('^%s*(' .. PATTERNS.MARKERS .. ')')
+
+    if list_marker then
+      -- Line already has a marker, extract it and the rest of the line
+      local line_without_marker = line:gsub('^(%s*' .. PATTERNS.MARKERS .. '%s*)', '')
+      -- Get the marker from the new state
+      local state_marker = new_state:match(PATTERNS.MARKERS)
+      -- Replace the marker in the new state with the existing marker
+      local adjusted_state = new_state:gsub('^' .. state_marker, list_marker)
+      return indent .. adjusted_state .. ' ' .. line_without_marker
+    else
+      -- No marker, add the new state as is
+      return indent .. new_state .. ' ' .. line:gsub(PATTERNS.INDENT, '')
+    end
   end
 end
 

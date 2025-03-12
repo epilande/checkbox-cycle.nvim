@@ -333,4 +333,19 @@ describe('checkbox-cycle', function()
     checkbox_cycle.cycle_next()
     assert.are.same({ '  + [ ] Indented checkbox' }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
   end)
+
+  it('handles lines that already have a list marker', function()
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, {
+      '- Task without checkbox dash',
+      '+ Task without checkbox plus',
+      '* Task without checkbox asterisk',
+    })
+    vim.cmd('normal! V2j')
+    checkbox_cycle.cycle_next()
+    assert.are.same({
+      '- [ ] Task without checkbox dash',
+      '+ [ ] Task without checkbox plus',
+      '* [ ] Task without checkbox asterisk',
+    }, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  end)
 end)
